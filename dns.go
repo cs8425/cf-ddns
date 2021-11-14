@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"net"
 
 	"github.com/Sirupsen/logrus"
@@ -27,15 +28,16 @@ func NewCFDNSUpdater(zoneId string, apiKey string, apiEmail string, log *logrus.
 }
 
 func (c *CFDNSUpdater) UpdateRecordA(host string, ip net.IP) error {
+	ctx := context.Background()
 	// Fetch record IDs for the records we need to update.
-	records, err := c.cf.DNSRecords(c.zoneId, cloudflare.DNSRecord{Name: host, Type: "A"})
+	records, err := c.cf.DNSRecords(ctx, c.zoneId, cloudflare.DNSRecord{Name: host, Type: "A"})
 	if err != nil {
 		return err
 	}
 
 	for _, r := range records {
 		c.log.Infof("Updating record with ID %s to %s", r.ID, ip.String())
-		err := c.cf.UpdateDNSRecord(c.zoneId, r.ID, cloudflare.DNSRecord{Content: ip.String()})
+		err := c.cf.UpdateDNSRecord(ctx, c.zoneId, r.ID, cloudflare.DNSRecord{Content: ip.String()})
 		if err != nil {
 			return err
 		}
