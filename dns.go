@@ -27,6 +27,19 @@ func NewCFDNSUpdater(zoneId string, apiKey string, apiEmail string, log *logrus.
 	}, nil
 }
 
+func NewCFDNSUpdaterToken(zoneId string, apiKey string, log *logrus.Entry) (*CFDNSUpdater, error) {
+	api, err := cloudflare.NewWithAPIToken(apiKey)
+	if err != nil {
+		return nil, err
+	}
+
+	return &CFDNSUpdater{
+		cf:     api,
+		zoneId: zoneId,
+		log:    log,
+	}, nil
+}
+
 func (c *CFDNSUpdater) UpdateRecordA(host string, ip net.IP) error {
 	ctx := context.Background()
 	// Fetch record IDs for the records we need to update.

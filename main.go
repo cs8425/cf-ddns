@@ -21,8 +21,9 @@ func main() {
 		ipAddress = app.Flag("ip-address", "Skip resolving external IP and use provided IP").String()
 		noVerify  = app.Flag("no-verify", "Don't verify ssl certificates").Bool()
 
-		cfEmail  = app.Flag("cf-email", "Cloudflare Email").Required().String()
-		cfApiKey = app.Flag("cf-api-key", "Cloudflare API key").Required().String()
+		// cfEmail  = app.Flag("cf-email", "Cloudflare Email").Required().String()
+		// cfApiKey = app.Flag("cf-api-key", "Cloudflare API key").Required()
+		cfApiToken = app.Flag("cf-api-token", "Cloudflare API token").Required().String()
 		cfZoneId = app.Flag("cf-zone-id", "Cloudflare Zone ID").Required().String()
 
 		hostnames = app.Arg("hostnames", "Hostnames to update").Required().Strings()
@@ -46,7 +47,8 @@ func main() {
 		ip = &IpifyIPService{HttpClient: httpClient}
 	}
 
-	if dns, err = NewCFDNSUpdater(*cfZoneId, *cfApiKey, *cfEmail, log.WithField("component", "cf-dns-updater")); err != nil {
+	if dns, err = NewCFDNSUpdaterToken(*cfZoneId, *cfApiToken, log.WithField("component", "cf-dns-updater")); err != nil {
+	// if dns, err = NewCFDNSUpdater(*cfZoneId, *cfApiKey, *cfEmail, log.WithField("component", "cf-dns-updater")); err != nil {
 		log.Panic(err)
 	}
 
